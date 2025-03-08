@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hell_Grok's httplib Realm</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            background: #000;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            background: rgba(20, 20, 20, 0.9);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.3);
+            border: 2px solid #ff0040;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #ff0040;
+            text-shadow: 0 0 10px #ff0040, 0 0 20px #ff0040;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            animation: glitch 2s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 100% {
+                transform: translate(0);
+            }
+
+            10%, 30%, 50%, 70%, 90% {
+                transform: translate(-2px, 2px);
+            }
+
+            20%, 40%, 60%, 80% {
+                transform: translate(2px, -2px);
+            }
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .button {
+            color: #fff;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+            .button:hover {
+                transform: scale(1.1);
+            }
+
+        .button-inject {
+            background: #00cc00;
+            box-shadow: 0 0 15px #00cc00;
+        }
+
+            .button-inject:hover {
+                background: #00ff00;
+                box-shadow: 0 0 25px #00ff00;
+            }
+
+        .button-cleaner {
+            background: #ff0040;
+            box-shadow: 0 0 15px #ff0040;
+        }
+
+            .button-cleaner:hover {
+                background: #ff4060;
+                box-shadow: 0 0 25px #ff4060;
+            }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .button {
+                padding: 12px 30px;
+                font-size: 1rem;
+                width: 100%;
+            }
+        }
+
+        /* Styl dla animowanego powiadomienia */
+        .success-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px var(--notification-color, #ff0040);
+            box-shadow: 0 0 20px var(--notification-color, #ff0040);
+            opacity: 0;
+            transform: translateY(-100%);
+            animation: slideDownFade 3s ease-out forwards;
+            z-index: 1000;
+        }
+
+        @keyframes slideDownFade {
+            0% {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+
+            10% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            90% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(100vh);
+            }
+        }
+
+        /* Styl dla okna logów */
+        #logWindow {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 300px;
+            max-height: 400px;
+            background: rgba(20, 20, 20, 0.9);
+            border: 2px solid #ff0040;
+            border-radius: 10px;
+            padding: 15px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+            display: none;
+        }
+
+            #logWindow.show {
+                display: block;
+            }
+
+        #logContent {
+            color: #fff;
+            font-size: 0.9rem;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            line-height: 1.4;
+        }
+
+        #closeLogs {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #ff0040;
+            border: none;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+            #closeLogs:hover {
+                background: #ff4060;
+            }
+    </style>
+</head>
+<body>
+    <canvas id="animatedLines"></canvas>
+    <div class="container">
+        <h1>Grok mój kochany</h1>
+        <div class="buttons">
+            <button class="button button-inject" onclick="fetchEndpoint('/inject')">Inject</button>
+            <button class="button button-cleaner" onclick="fetchEndpoint('/cleaner')">Cleaner</button>
+        </div>
+    </div>
+    <div id="logWindow">
+        <button id="closeLogs">Zamknij</button>
+        <div id="logContent"></div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('animatedLines');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        const particles = [];
+        const numParticles = 60;
+        const maxDistance = 150;
+
+        class Particle {
+            constructor() {
+                this.size = Math.random() * 4 + 2;
+                this.x = Math.random() * (canvas.width - this.size * 2) + this.size;
+                this.y = Math.random() * (canvas.height - this.size * 2) + this.size;
+                this.speedX = (Math.random() - 0.5) * 1.5;
+                this.speedY = (Math.random() - 0.5) * 1.5;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x + this.size > canvas.width || this.x - this.size < 0) this.speedX = -this.speedX;
+                if (this.y + this.size > canvas.height || this.y - this.size < 0) this.speedY = -this.speedY;
+            }
+
+            draw() {
+                ctx.fillStyle = '#ff0040';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function connectParticles() {
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < maxDistance) {
+                        const opacity = 1 - (distance / maxDistance);
+                        ctx.strokeStyle = `rgba(255, 0, 64, ${opacity * 0.5})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function init() {
+            particles.length = 0;
+            for (let i = 0; i < numParticles; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        let animationFrameId;
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            connectParticles();
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+
+        window.addEventListener('unload', () => {
+            cancelAnimationFrame(animationFrameId);
+        });
+
+        // Poprawiona funkcja fetch z animowanym powiadomieniem
+        function fetchEndpoint(endpoint) {
+            fetch(endpoint)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Serwer zwróci³ b³¹d: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    if (data && (data.includes('Finished') || data.includes('zakoñczona'))) {
+                        showSuccessNotification(data, endpoint);
+                    } else {
+                        alert('Operacja zakoñczona bez szczegó³ów.');
+                    }
+                })
+                .catch(error => alert('Erro: ' + error.message));
+        }
+
+        function showSuccessNotification(message, endpoint) {
+            const notification = document.createElement('div');
+            notification.className = 'success-notification';
+            notification.textContent = message || 'Operacja zakoñczona!';
+
+            if (endpoint === '/inject') {
+                notification.style.setProperty('--notification-color', '#00ff00');
+            } else if (endpoint === '/cleaner') {
+                notification.style.setProperty('--notification-color', '#ff4060');
+            }
+
+            document.body.appendChild(notification);
+            notification.addEventListener('animationend', () => notification.remove());
+        }
+
+        // Okno logów
+        const logWindow = document.getElementById('logWindow');
+        const logContent = document.getElementById('logContent');
+        const closeLogs = document.getElementById('closeLogs');
+
+        closeLogs.addEventListener('click', () => {
+            logWindow.classList.remove('show');
+        });
+
+        function updateLogs() {
+            fetch('/logs')
+                .then(response => {
+                    if (!response.ok) throw new Error('Nie mo¿na pobraæ logów');
+                    return response.text();
+                })
+                .then(logs => {
+                    logContent.textContent = logs;
+                    logWindow.classList.add('show');
+                })
+                .catch(error => console.error('B³¹d pobierania logów:', error));
+        }
+
+        // Odœwie¿anie logów co 2 sekundy
+        setInterval(updateLogs, 2000);
+
+        // Otwieranie logów po klikniêciu na ciele strony (opcjonalne, mo¿esz usun¹æ)
+        document.body.addEventListener('click', (e) => {
+            if (e.target.tagName !== 'BUTTON') { // Nie otwieraj, jeœli klikniêto przycisk
+                updateLogs();
+            }
+        });
+    </script>
+</body>
+</html>
