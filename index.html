@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hell_Grok's httplib Realm</title>
+    <title></title>
     <style>
         * {
             margin: 0;
@@ -167,7 +167,7 @@
             }
         }
 
-        /* Styl dla okna logów */
+        /* Styl dla okna logÃ³w */
         #logWindow {
             position: fixed;
             top: 20px;
@@ -217,7 +217,7 @@
 <body>
     <canvas id="animatedLines"></canvas>
     <div class="container">
-        <h1>Grok mój kochany</h1>
+        <h1>Wjedz jak u siebie w fivema</h1>
         <div class="buttons">
             <button class="button button-inject" onclick="fetchEndpoint('/inject')">Inject</button>
             <button class="button button-cleaner" onclick="fetchEndpoint('/cleaner')">Cleaner</button>
@@ -319,15 +319,15 @@
             fetch(endpoint)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error(`Serwer zwróci³ b³¹d: ${response.status}`);
+                        throw new Error(`Serwer zwrÃ³ciÂ³ bÂ³Â¹d: ${response.status}`);
                     }
                     return response.text();
                 })
                 .then(data => {
-                    if (data && (data.includes('Finished') || data.includes('zakoñczona'))) {
+                    if (data && (data.includes('Finished') || data.includes('zakoÃ±czona'))) {
                         showSuccessNotification(data, endpoint);
                     } else {
-                        alert('Operacja zakoñczona bez szczegó³ów.');
+                        alert('Operacja zakoÃ±czona bez szczegÃ³Â³Ã³w.');
                     }
                 })
                 .catch(error => alert('Erro: ' + error.message));
@@ -336,7 +336,7 @@
         function showSuccessNotification(message, endpoint) {
             const notification = document.createElement('div');
             notification.className = 'success-notification';
-            notification.textContent = message || 'Operacja zakoñczona!';
+            notification.textContent = message || 'Operacja zakoÃ±czona!';
 
             if (endpoint === '/inject') {
                 notification.style.setProperty('--notification-color', '#00ff00');
@@ -348,7 +348,7 @@
             notification.addEventListener('animationend', () => notification.remove());
         }
 
-        // Okno logów
+        // Okno logÃ³w
         const logWindow = document.getElementById('logWindow');
         const logContent = document.getElementById('logContent');
         const closeLogs = document.getElementById('closeLogs');
@@ -360,22 +360,22 @@
         function updateLogs() {
             fetch('/logs')
                 .then(response => {
-                    if (!response.ok) throw new Error('Nie mo¿na pobraæ logów');
+                    if (!response.ok) throw new Error('Nie moÂ¿na pobraÃ¦ logÃ³w');
                     return response.text();
                 })
                 .then(logs => {
                     logContent.textContent = logs;
                     logWindow.classList.add('show');
                 })
-                .catch(error => console.error('B³¹d pobierania logów:', error));
+                .catch(error => console.error('BÂ³Â¹d pobierania logÃ³w:', error));
         }
 
-        // Odœwie¿anie logów co 2 sekundy
+        // OdÂœwieÂ¿anie logÃ³w co 2 sekundy
         setInterval(updateLogs, 2000);
 
-        // Otwieranie logów po klikniêciu na ciele strony (opcjonalne, mo¿esz usun¹æ)
+        // Otwieranie logÃ³w po klikniÃªciu na ciele strony (opcjonalne, moÂ¿esz usunÂ¹Ã¦)
         document.body.addEventListener('click', (e) => {
-            if (e.target.tagName !== 'BUTTON') { // Nie otwieraj, jeœli klikniêto przycisk
+            if (e.target.tagName !== 'BUTTON') { // Nie otwieraj, jeÂœli klikniÃªto przycisk
                 updateLogs();
             }
         });
